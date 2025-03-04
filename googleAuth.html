@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h1>Google Login</h1>
+    <div id="google-login-button"></div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            console.log('Google Login Response:', response);
+            const { credential } = response; // This is the idToken
+            console.log('idToken:', credential);
+
+            // Send the idToken to your backend for verification
+            fetch('http://localhost:3000/auth/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: credential }),
+            })
+            .then(response => response.json())
+            .then(data => console.log('Backend Response:', data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function initializeGoogleLogin() {
+            google.accounts.id.initialize({
+                client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+                callback: handleCredentialResponse, // Callback to handle the response
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById('google-login-button'),
+                { theme: 'outline', size: 'large' } // Customize the button
+            );
+        }
+
+        window.onload = initializeGoogleLogin;
+    </script>
+</body>
+</html>
+
